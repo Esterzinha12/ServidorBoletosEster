@@ -1,79 +1,89 @@
-const express= require("express");
-const router=express.Router();
+const express = require("express");
+const router = express.Router();
+const { listaBoletos } = require("./listaBoletos");
 
-const listaUsuarios=[
+const listaUsuarios = [
     {
         id: 1,
         nome: 'Kenzo',
-        cpf: '09693152956'
-        
+        cpf: '0969'
+
     },
     {
         id: 2,
         nome: 'Thiago',
-        cpf: '12345678925'
-        
+        senha: '1234'
+
     },
     {
         id: 3,
         nome: 'Matheus',
-        cpf: '56974521456'
+        cpf: '5697'
     }
 ]
 
-function selectUsuarios(){
+router.get('/', (req, res) => {
+    res.send(selectUsuarios());
+})
+
+function selectUsuarios() {
     return listaUsuarios;
 }
 
-function selectID(id){
-    const usuarios=listaUsuarios.find(p=> p.id ==id)
+router.get('/:id', (req, res) => {
+    const id = req.params.id
+    res.json(selectIDUsuario(id))
+})
+
+function selectIDUsuario(id) {
+    const usuarios = listaUsuarios.find(p => p.id == id)
     return usuarios
 }
 
-function adicionarUsuario(usuarios){
-    usuarios.id=listaUsuarios.length+1
+router.post('/', (req, res) => {
+    const usuarios = req.body
+    if (pessoa.nome != "" && pessoa.senha != "") {
+        res.json(adicionarUsuario(usuarios))
+    } else {
+        return "Campos não inseridos!";
+    }
+})
+
+function adicionarUsuario(usuarios) {
+    usuarios.id = listaUsuarios.length + 1
     listaUsuarios.push(usuarios)
     return usuarios
 }
 
-function editarUsuario(id, usuarios){
-    const index= listaUsuarios.findIndex(p=> p.id==id)
-    usuarios.id=id
-    listaUsuarios[index]=usuarios
-    return usuarios
-}
-function deletarUsuario(){
-    listaUsuarios.splice(index, 1)
-    return usuarios
-}
-
-router.get('/', (req, res)=>{
-    res.send(selectUsuarios());
-})
-router.get('/:id', (req, res)=>{
-    const id=req.params.id
-    res.json(selectID(id))
-})
-
-router.post('/', (req, res)=>{
-    const usuarios= req.body
-    res.json(adicionarUsuario(usuarios))
-})
-
-router.put('/:id', (req,res)=>{
-    const id= req.params.id
-    const usuarios= req.body
+router.put('/:id', (req, res) => {
+    const id = req.params.id
+    const usuarios = req.body
     res.json(editarUsuario(id, usuarios))
 })
 
+function editarUsuario(id, usuarios) {
+    const index = listaUsuarios.findIndex(p => p.id == id)
+    usuarios.id = id
+    listaUsuarios[index] = usuarios
+    return usuarios
+}
 router.delete('/:id', (req, res) => {
     const id = req.params.id
-    const index = listaUsuarios.findIndex(p => p.id == id)
-    res.json(deletarUsuario(id, index))
+    res.json(deletarUsuario(id))
 })
 
+function deletarUsuario(id) {
+    if (listaBoletos.find(b => b.idUser == id)) {
+        return "Não é possivel deletar se o usuario tem boleto!"
+    } else {
+        const index = listaUsuarios.findIndex(p => p.id == id)
+        listaUsuarios.splice(index, 1)
+        return listaUsuarios
+    }
+
+}
 
 module.exports = {
     router,
-    selectUsuarios
+    selectIDUsuario
 }
